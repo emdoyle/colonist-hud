@@ -63,7 +63,7 @@ class WebsocketIngest:
             self._create_initial_game_objects(players=player_data)
         else:
             if self.game_id is not None:
-                print(f"Recording message with id: {json_id}")
+                print(f"Recording message with id: {json_id} ({str(opcode)})")
                 GameStateChange.objects.create(
                     game_id=self.game_id, message={"id": json_id, "data": json_data}
                 )
