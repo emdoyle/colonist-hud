@@ -10,7 +10,7 @@ from asgiref.sync import sync_to_async
 
 from games.dataclasses import PlayerData
 from games.models import Player, Game, PlayerInGame, GameStateChange
-from ingestion.constants import OPCODES_BY_VALUE, Opcode
+from ingestion.constants import OPCODES_BY_VALUE, Opcode, SendingOpcode
 
 
 class WebsocketIngest:
@@ -49,7 +49,7 @@ class WebsocketIngest:
         opcode = OPCODES_BY_VALUE.get(json_id, Opcode.UNKNOWN)
         if opcode is Opcode.SINGLE_GAME_LISTING and not self.game_slug:
             self.game_slug = json_data
-            self._send(data=json_data, opcode=Opcode.JOIN_GAME)
+            self._send(data=json_data, opcode=SendingOpcode.JOIN_GAME)
         elif opcode is Opcode.TEXT:
             self._handle_text(json_data.get("text", ""))
         elif opcode is Opcode.PLAYER_INFO and not self.game_id:
@@ -81,10 +81,10 @@ class WebsocketIngest:
 
     def _on_open(self):
         print("Websocket opened!")
-        self._send(data=True, opcode=Opcode.INIT_ONE)
-        self._send(data=True, opcode=Opcode.TEXT)
+        self._send(data=True, opcode=SendingOpcode.INIT_ONE)
+        self._send(data=True, opcode=SendingOpcode.INIT_TWO)
 
-    def _send(self, data: Any, opcode: "Opcode"):
+    def _send(self, data: Any, opcode: "SendingOpcode"):
         self.websocket.send(json.dumps({"id": opcode.value, "data": data}))
 
     @sync_to_async
