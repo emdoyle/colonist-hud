@@ -23,4 +23,7 @@ class PlayerInGame(models.Model):
 
 
 class GameStateChange(models.Model):
+    game = models.ForeignKey(
+        to="games.Game", on_delete=models.CASCADE, related_name="state_changes",
+    )
     message = models.JSONField(default=dict)

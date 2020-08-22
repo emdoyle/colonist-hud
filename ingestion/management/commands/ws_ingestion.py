@@ -6,6 +6,10 @@ from ingestion.ingest import WebsocketIngest
 
 
 class Command(BaseCommand):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tasks = []
+
     def add_arguments(self, parser):
         parser.add_argument(
             "concurrency",
@@ -15,18 +19,21 @@ class Command(BaseCommand):
         )
 
     async def ws_ingest(self):
-        WebsocketIngest().open(
+        await WebsocketIngest().open(
             target="wss://colonist.io/", http_target="https://colonist.io/"
         )
 
     async def _handle(self, *args, **options):
         concurrency = int(options.get("concurrency", 1))
-        tasks = []
         for _ in range(concurrency):
-            tasks.append(asyncio.create_task(self.ws_ingest()))
+            self.tasks.append(asyncio.create_task(self.ws_ingest()))
 
-        for task in tasks:
+        for task in self.tasks:
             await task
 
     def handle(self, *args, **options):
-        asyncio.run(self._handle(*args, **options))
+        try:
+            asyncio.run(self._handle(*args, **options))
+        except KeyboardInterrupt:
+            # this doesn't actually work, might be something with threads in websocket-client library
+            print("Caught KeyboardInterrupt. Exiting!")

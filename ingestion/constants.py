@@ -4,7 +4,7 @@ from enum import Enum
 class Opcode(Enum):
     UNKNOWN = -1
     INIT_ONE = 1
-    INIT_TWO = 4
+    TEXT = 4
     COMPOSITE_GAME_LISTINGS = 39
     SINGLE_GAME_LISTING = 38
     JOIN_GAME = 11
