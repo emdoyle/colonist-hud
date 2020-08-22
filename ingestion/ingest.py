@@ -31,7 +31,6 @@ class WebsocketIngest:
 
     def _create_initial_game_objects(self, players: List["PlayerData"]) -> None:
         game = Game.objects.create(slug=self.game_slug)
-        print(f"Creating game with id: {game.id}")
         self.game_id = game.id
         for player in players:
             new_player = Player.objects.create(
@@ -47,23 +46,28 @@ class WebsocketIngest:
         json_message = json.loads(message)
         json_data = json_message.get("data")
         json_id = json_message.get("id", "-1")
-        print(f"Received {json_id}")
         opcode = OPCODES_BY_VALUE.get(json_id, Opcode.UNKNOWN)
         if opcode is Opcode.SINGLE_GAME_LISTING and not self.game_slug:
             self.game_slug = json_data
             self._send(data=json_data, opcode=Opcode.JOIN_GAME)
         elif opcode is Opcode.TEXT:
             self._handle_text(json_data.get("text", ""))
-        elif opcode is Opcode.INITIAL_PLAYER_INFO and not self.game_id:
+        elif opcode is Opcode.PLAYER_INFO and not self.game_id:
             player_data = [
                 PlayerData(username=data["playerName"], is_bot=data["isBot"])
                 for data in json_data
             ]
-            print("About to create initial game objects")
             self._create_initial_game_objects(players=player_data)
+        elif opcode is Opcode.UNKNOWN:
+            print(f"Unknown message: {json_id}")
+            if self.game_id is not None:
+                GameStateChange.objects.create(
+                    game_id=self.game_id, message={"id": json_id, "data": json_data}
+                )
+            else:
+                print(f"pre-game {json_data}")
         else:
             if self.game_id is not None:
-                print(f"Recording message with id: {json_id} ({str(opcode)})")
                 GameStateChange.objects.create(
                     game_id=self.game_id, message={"id": json_id, "data": json_data}
                 )
