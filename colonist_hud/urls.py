@@ -15,12 +15,12 @@ Including another URLconf
 """
 from django.urls import path
 
-from games.views import TotalIncomeAPIView
+from games.views import total_income_api_view
 
 urlpatterns = [
     path(
         "api/v1/game_stats/<slug:game_slug>/total_income",
-        TotalIncomeAPIView.as_view(),
+        total_income_api_view,
         name="total_income_api",
     )
 ]
