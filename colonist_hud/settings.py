@@ -33,6 +33,8 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+ASGI_APPLICATION = "colonist_hud.routing.application"
+
 INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -40,6 +42,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "games",
     "ingestion",
+    "channels",
 ]
 
 MIDDLEWARE = [
