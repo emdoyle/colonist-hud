@@ -1,5 +1,6 @@
 from typing import Dict
 
+from ingestion.constants import Opcode
 from utils.serialization import keys_to_snake
 from games.dataclasses import (
     ResourceReceived,
@@ -35,3 +36,11 @@ def deserialize_trade_completed(json_data: Dict) -> TradeCompleted:
             for resource_data in json_data["receivingCards"]
         ],
     )
+
+
+RESOURCE_OPCODE_DISPATCH = {
+    Opcode.RESOURCE_RECEIVED.value: deserialize_resource_received,
+    Opcode.ROBBED.value: deserialize_robbed,
+    Opcode.RESOURCE_BOUGHT.value: deserialize_resource_bought,
+    Opcode.TRADE_COMPLETED.value: deserialize_trade_completed,
+}
