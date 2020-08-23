@@ -1,5 +1,7 @@
 from django.db import models
 
+from games.managers import GameStateChangeManager
+
 
 class Player(models.Model):
     username = models.CharField(max_length=300)
@@ -7,7 +9,7 @@ class Player(models.Model):
 
 
 class Game(models.Model):
-    slug = models.CharField(max_length=300)
+    slug = models.CharField(max_length=300)  # make this unique
     players = models.ManyToManyField(
         to="games.Player", through="games.PlayerInGame", related_name="games",
     )
@@ -27,3 +29,5 @@ class GameStateChange(models.Model):
         to="games.Game", on_delete=models.CASCADE, related_name="state_changes",
     )
     message = models.JSONField(default=dict)
+
+    objects = GameStateChangeManager()

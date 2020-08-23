@@ -13,5 +13,14 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.urls import path
 
-urlpatterns = []
+from games.views import TotalIncomeAPIView
+
+urlpatterns = [
+    path(
+        "api/v1/game_stats/<slug:game_slug>/total_income",
+        TotalIncomeAPIView.as_view(),
+        name="total_income_api",
+    )
+]

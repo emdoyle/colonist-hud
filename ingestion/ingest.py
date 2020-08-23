@@ -9,6 +9,7 @@ from typing import Optional, List, Any
 from asgiref.sync import sync_to_async
 
 from games.dataclasses import PlayerData
+from games.mapping.player import deserialize_player_data
 from games.models import Player, Game, PlayerInGame, GameStateChange
 from ingestion.constants import OPCODES_BY_VALUE, Opcode, SendingOpcode
 
@@ -53,10 +54,7 @@ class WebsocketIngest:
         elif opcode is Opcode.TEXT:
             self._handle_text(json_data.get("text", ""))
         elif opcode is Opcode.PLAYER_INFO and not self.game_id:
-            player_data = [
-                PlayerData(username=data["playerName"], is_bot=data["isBot"])
-                for data in json_data
-            ]
+            player_data = deserialize_player_data(json_data=json_data)
             self._create_initial_game_objects(players=player_data)
         elif opcode is Opcode.UNKNOWN:
             print(f"Unknown message: {json_id}")
