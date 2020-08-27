@@ -19,7 +19,21 @@ class BaseMessageObserver(ABC):
 
 
 class MessageObserver(BaseMessageObserver):
+    """
+    The base concrete implementation of a BaseMessageObserver.
+
+    It adds game_state as an instance variable, and defines a simple mapping
+    of methods to opcodes by name.
+
+    When a message is received with an opcode named RESOURCE_RECEIVED for example,
+    the class will look for a method called receive_resource_received, and otherwise use
+    receive_default.
+
+    The message is passed as the only argument to receiving functions.
+    """
+
     def __init__(self, game_state: GameState):
+        # TODO: fancy property/inheritance stuff to block writes except from GameStateWriter
         self.game_state = game_state
 
     @classmethod
