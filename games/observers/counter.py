@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 
 from games.dataclasses.game import GameState
 from games.mapping.resources import deserialize_resource_received
@@ -13,11 +13,19 @@ class Counter(MessageObserver):
         super().__init__(game_state=game_state)
         self.quantity = quantity if quantity is not None else 0
 
+    @property
+    def data(self) -> Any:
+        return self.quantity
+
 
 class CounterByPlayer(MessageObserver):
     def __init__(self, game_state: GameState):
         super().__init__(game_state=game_state)
         self.quantities = defaultdict(int)
+
+    @property
+    def data(self) -> Any:
+        return self.quantities
 
 
 class IncomeByPlayer(CounterByPlayer):
@@ -34,3 +42,17 @@ class IncomeByPlayer(CounterByPlayer):
         except AttributeError:
             # TODO: logging
             print("Couldnt update quantities")
+
+
+class Turns(Counter):
+    def __init__(self, game_state: GameState, quantity: Optional[int] = None):
+        super().__init__(game_state=game_state)
+        self.previous_player_color = None
+
+    async def receive_turn_state_change(self, message: Dict):
+        # need to check for change in player color
+        current_player_color = message["currentTurnPlayerColor"]
+        if current_player_color != self.previous_player_color:
+            self.quantity += 1
+            self.previous_player_color = current_player_color
+            print(f"Turns ({id(self)}): {self.quantity}")

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, TypeVar, Type
+from typing import Dict, TypeVar, Type, Any
 
 from games.dataclasses.game import GameState
 from ingestion.constants import Opcode
@@ -16,6 +16,10 @@ class BaseMessageObserver(ABC):
     @abstractmethod
     async def receive(self, message: Dict) -> None:
         ...
+
+    @property
+    def data(self) -> Any:
+        return None
 
 
 class MessageObserver(BaseMessageObserver):

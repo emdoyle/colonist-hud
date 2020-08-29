@@ -2,13 +2,13 @@ import asyncio
 import json
 from collections import defaultdict
 from itertools import chain
-from typing import Optional, List
+from typing import Optional, List, Iterable
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 from games.dataclasses.game import GameState
 from games.observers.base import MessageObserver
-from games.observers.counter import IncomeByPlayer
+from games.observers.counter import IncomeByPlayer, Turns
 from games.observers.game_state import GameStateWriter
 from ingestion.constants import Opcode
 
@@ -29,9 +29,29 @@ class GameEventConsumer(AsyncWebsocketConsumer):
             for opcode in opcodes:
                 self.subscribers[opcode].append(subscriber)
 
+    @property
+    def all_subscribers(self) -> Iterable:
+        return chain(*self.subscribers.values(), self.broadcast_subscribers)
+
+    @property
+    def subscriber_data(self) -> List:
+        # need to organize this
+        return [
+            json.dumps(subscriber.data)
+            for subscriber in self.all_subscribers
+            if subscriber.data
+        ]
+
     async def connect(self):
         self.subscribe(GameStateWriter.from_game_state(game_state=self.game_state))
-        self.subscribe(IncomeByPlayer.from_game_state(game_state=self.game_state))
+        self.subscribe(
+            IncomeByPlayer.from_game_state(game_state=self.game_state),
+            opcodes=[Opcode.RESOURCE_RECEIVED],
+        )
+        self.subscribe(
+            Turns.from_game_state(game_state=self.game_state),
+            opcodes=[Opcode.TURN_STATE_CHANGE],
+        )
         await self.accept()
 
     async def disconnect(self, code):
@@ -43,7 +63,10 @@ class GameEventConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         try:
             opcode = Opcode(int(text_data_json["id"]))
-        except TypeError:
+        except KeyError:
+            if "recv" in text_data_json:
+                await self.send(self.subscriber_data)
+                return
             await self.send(
                 json.dumps({"data": "Unrecognized message (looking for key 'id')"})
             )
