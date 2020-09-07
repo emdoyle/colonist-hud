@@ -51,7 +51,6 @@ class IncomeByPlayer(CounterByKey):
                 self.game_state.player_for_color(resource_received.color).username
             ] += resource_received.amount
         except AttributeError:
-            # TODO: logging
             print("Couldnt update quantities")
 
 
@@ -63,7 +62,6 @@ class Turns(Counter):
         self.previous_player_color = None
 
     async def receive_turn_state_change(self, message: Dict):
-        # need to check for change in player color
         current_player_color = message["currentTurnPlayerColor"]
         if current_player_color != self.previous_player_color:
             self.quantity += 1
