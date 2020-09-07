@@ -9,6 +9,8 @@ class Identifier(MessageObserver):
         super().__init__(game_state=game_state)
         self.identifier = identifier
 
+    def __repr__(self):
+        return f"{type(self).__name__}(id={id(self)}, identifier={self.identifier})"
+
     async def receive_default(self, message: Dict) -> None:
         self.identifier = message.get("player")  # unlikely to be correct behavior
-        print(f"Identifier {id(self)}: {self.identifier}")

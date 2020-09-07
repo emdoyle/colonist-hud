@@ -8,7 +8,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 
 from games.dataclasses.game import GameState
 from games.observers.base import MessageObserver
-from games.observers.counter import IncomeByPlayer, Turns
+from games.observers.counter import IncomeByPlayer, Turns, Dice
 from games.observers.game_state import GameStateWriter
 from ingestion.constants import Opcode
 
@@ -51,6 +51,10 @@ class GameEventConsumer(AsyncWebsocketConsumer):
         self.subscribe(
             Turns.from_game_state(game_state=self.game_state),
             opcodes=[Opcode.TURN_STATE_CHANGE],
+        )
+        self.subscribe(
+            Dice.from_game_state(game_state=self.game_state),
+            opcodes=[Opcode.DICE_STATE_CHANGE],
         )
         await self.accept()
 
