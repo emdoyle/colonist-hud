@@ -10,6 +10,8 @@ from games.observers.base import MessageObserver
 
 
 class Counter(MessageObserver):
+    KEY = "counter"
+
     def __init__(self, game_state: GameState, quantity: Optional[int] = None):
         super().__init__(game_state=game_state)
         self.quantity = quantity if quantity is not None else 0
@@ -18,11 +20,13 @@ class Counter(MessageObserver):
         return f"{type(self).__name__}(id={id(self)}, quantity={self.quantity})"
 
     @property
-    def data(self) -> Any:
-        return self.quantity
+    def data(self) -> Dict:
+        return {self.KEY: self.quantity}
 
 
 class CounterByKey(MessageObserver):
+    KEY = "counter_by_key"
+
     def __init__(self, game_state: GameState):
         super().__init__(game_state=game_state)
         self.quantities = defaultdict(int)
@@ -33,11 +37,13 @@ class CounterByKey(MessageObserver):
         )
 
     @property
-    def data(self) -> Any:
-        return self.quantities
+    def data(self) -> Dict:
+        return {self.KEY: self.quantities}
 
 
 class IncomeByPlayer(CounterByKey):
+    KEY = "income_by_player"
+
     async def receive_resource_received(self, message: Dict):
         resource_received = deserialize_resource_received(message)
         try:
@@ -50,6 +56,8 @@ class IncomeByPlayer(CounterByKey):
 
 
 class Turns(Counter):
+    KEY = "turns"
+
     def __init__(self, game_state: GameState, quantity: Optional[int] = None):
         super().__init__(game_state=game_state, quantity=quantity)
         self.previous_player_color = None
@@ -63,6 +71,8 @@ class Turns(Counter):
 
 
 class Dice(CounterByKey):
+    KEY = "dice"
+
     async def receive_dice_state_change(self, message: Dict):
         dice_change = deserialize_dice_state_change(message)
         if dice_change.dice_thrown:

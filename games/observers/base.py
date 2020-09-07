@@ -18,8 +18,8 @@ class BaseMessageObserver(ABC):
         ...
 
     @property
-    def data(self) -> Any:
-        return None
+    def data(self) -> Dict:
+        return {}
 
 
 class MessageObserver(BaseMessageObserver):

@@ -2,7 +2,7 @@ import asyncio
 import json
 from collections import defaultdict
 from itertools import chain
-from typing import Optional, List, Iterable
+from typing import Optional, List, Iterable, Dict
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
@@ -34,13 +34,13 @@ class GameEventConsumer(AsyncWebsocketConsumer):
         return chain(*self.subscribers.values(), self.broadcast_subscribers)
 
     @property
-    def subscriber_data(self) -> List:
-        # need to organize this
-        return [
-            json.dumps(subscriber.data)
+    def subscriber_data(self) -> Dict:
+        return {
+            key: value
             for subscriber in self.all_subscribers
+            for key, value in subscriber.data.items()
             if subscriber.data
-        ]
+        }
 
     async def connect(self):
         self.subscribe(GameStateWriter.from_game_state(game_state=self.game_state))
@@ -69,7 +69,7 @@ class GameEventConsumer(AsyncWebsocketConsumer):
             opcode = Opcode(int(text_data_json["id"]))
         except KeyError:
             if "recv" in text_data_json:
-                await self.send(self.subscriber_data)
+                await self.send(json.dumps(self.subscriber_data))
                 return
             await self.send(
                 json.dumps({"data": "Unrecognized message (looking for key 'id')"})
