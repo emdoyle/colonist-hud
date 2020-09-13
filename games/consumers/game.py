@@ -11,6 +11,7 @@ from games.observers.base import MessageObserver
 from games.observers.counter import IncomeByPlayer, Turns, Dice
 from games.observers.game_state import GameStateWriter
 from ingestion.constants import Opcode
+from storage.redis import RedisPool
 
 
 class GameEventConsumer(AsyncWebsocketConsumer):

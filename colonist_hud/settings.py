@@ -28,12 +28,7 @@ SECRET_KEY = "*)#5gqu@7cq0oj32-**$ivf*r43!m)aagkq6xc501^bcz&z#tx"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "[::1]",
-    ".0x63problems.dev"
-]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]", ".0x63problems.dev"]
 
 
 # Application definition
@@ -94,6 +89,11 @@ DATABASES = {
         "PASSWORD": env.get("DB_PASSWORD", ""),
     }
 }
+
+
+REDIS_HOST = env.get("REDIS_HOST", "localhost")
+REDIS_PORT = int(env.get("REDIS_PORT", 6379))
+REDIS_MAIN_DB_NO = int(env.get("REDIS_MAIN_DB_NO", 0))
 
 
 # Password validation
