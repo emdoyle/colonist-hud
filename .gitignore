@@ -2,3 +2,4 @@
 **/**.har
 .python-version
 .idea/
+deploy/
