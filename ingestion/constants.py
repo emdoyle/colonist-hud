@@ -10,6 +10,7 @@ class SendingOpcode(Enum):
 
 
 class Opcode(Enum):
+    HANDSHAKE = -2  # negative to avoid overlap with original opcodes
     UNKNOWN = -1
     INIT_ZERO = 0  # website sends false before game multiple times
     INIT_ONE = 1

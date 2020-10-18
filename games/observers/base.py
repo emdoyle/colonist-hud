@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, TypeVar, Type, Any
+from typing import Dict, TypeVar, Type, Any, Optional
 
 from games.dataclasses.game import GameState
 from ingestion.constants import Opcode
@@ -14,7 +14,7 @@ class BaseMessageObserver(ABC):
         ...
 
     @abstractmethod
-    async def receive(self, message: Dict) -> None:
+    async def receive(self, message: Dict) -> Optional[Any]:
         ...
 
     @property
@@ -47,10 +47,10 @@ class MessageObserver(BaseMessageObserver):
     def should_receive(self) -> bool:
         return self.game_state.initialized
 
-    async def receive_default(self, message: Dict) -> None:
+    async def receive_default(self, message: Dict) -> Optional[Any]:
         pass
 
-    async def receive(self, message: Dict) -> None:
+    async def receive(self, message: Dict) -> Optional[Any]:
         try:
             opcode = Opcode(int(message.get("id", "-1")))
             data = message.get("data", {})
@@ -58,7 +58,8 @@ class MessageObserver(BaseMessageObserver):
             return
         if not self.should_receive:
             return
-        await getattr(self, f"receive_{opcode.name.lower()}", self.receive_default)(
-            data
-        )
+        result = await getattr(
+            self, f"receive_{opcode.name.lower()}", self.receive_default
+        )(data)
         print(self)
+        return result

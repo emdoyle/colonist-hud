@@ -91,7 +91,7 @@ DATABASES = {
         "HOST": env.get("DB_HOST", "localhost"),
         "PORT": int(env.get("DB_PORT", 5432)),
         "NAME": env.get("DB_NAME", "colonist"),
-        "USER": env.get("DB_USER", "colonist"),
+        "USER": env.get("DB_USER", "postgres"),
         "PASSWORD": env.get("DB_PASSWORD", ""),
     }
 }

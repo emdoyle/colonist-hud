@@ -11,7 +11,6 @@ from games.observers.base import MessageObserver
 from games.observers.counter import IncomeByPlayer, Turns, Dice
 from games.observers.game_state import GameStateWriter
 from ingestion.constants import Opcode
-from storage.redis import RedisPool
 
 
 class GameEventConsumer(AsyncWebsocketConsumer):
@@ -69,9 +68,6 @@ class GameEventConsumer(AsyncWebsocketConsumer):
         try:
             opcode = Opcode(int(text_data_json["id"]))
         except KeyError:
-            if "recv" in text_data_json:
-                await self.send(json.dumps(self.subscriber_data))
-                return
             await self.send(
                 json.dumps({"data": "Unrecognized message (looking for key 'id')"})
             )
@@ -82,4 +78,6 @@ class GameEventConsumer(AsyncWebsocketConsumer):
         coros = []
         for subscriber in chain(self.subscribers[opcode], self.broadcast_subscribers):
             coros.append(subscriber.receive(text_data_json))
-        await asyncio.gather(*coros)
+        results = await asyncio.gather(*coros)
+        for result in filter(lambda res: res is not None, results):
+            await self.send(json.dumps(result))
