@@ -61,5 +61,5 @@ class MessageObserver(BaseMessageObserver):
         result = await getattr(
             self, f"receive_{opcode.name.lower()}", self.receive_default
         )(data)
-        print(self)
+        print(self, f"Result: {result}")
         return result

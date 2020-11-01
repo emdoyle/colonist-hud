@@ -50,6 +50,7 @@ class IncomeByPlayer(CounterByKey):
             self.quantities[
                 self.game_state.player_for_color(resource_received.color).username
             ] += resource_received.amount
+            return self.data
         except AttributeError:
             print("Couldnt update quantities")
 
@@ -66,6 +67,7 @@ class Turns(Counter):
         if current_player_color != self.previous_player_color:
             self.quantity += 1
             self.previous_player_color = current_player_color
+            return self.data
 
 
 class Dice(CounterByKey):
@@ -75,3 +77,4 @@ class Dice(CounterByKey):
         dice_change = deserialize_dice_state_change(message)
         if dice_change.dice_thrown:
             self.quantities[dice_change.total_roll] += 1
+            return self.data
