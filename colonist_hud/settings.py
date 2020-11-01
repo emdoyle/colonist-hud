@@ -10,10 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-import os
 from pathlib import Path
+from environs import Env
 
-env = os.environ
+env = Env()
+
+env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -23,12 +25,12 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.get("DEBUG", False)
+DEBUG = env.str("DEBUG", False)
 
 if DEBUG:
     ALLOWED_HOSTS = []
     # SECURITY WARNING: keep the secret key used in production secret!
-    SECRET_KEY = env.get(
+    SECRET_KEY = env.str(
         "SECRET_KEY", "*)#5gqu@7cq0oj32-**$ivf*r43!m)aagkq6xc501^bcz&z#tx"
     )
 else:
@@ -88,18 +90,18 @@ WSGI_APPLICATION = "colonist_hud.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "HOST": env.get("DB_HOST", "localhost"),
-        "PORT": int(env.get("DB_PORT", 5432)),
-        "NAME": env.get("DB_NAME", "colonist"),
-        "USER": env.get("DB_USER", "postgres"),
-        "PASSWORD": env.get("DB_PASSWORD", ""),
+        "HOST": env.str("DB_HOST", "localhost"),
+        "PORT": env.int("DB_PORT", 5432),
+        "NAME": env.str("DB_NAME", "colonist"),
+        "USER": env.str("DB_USER", "postgres"),
+        "PASSWORD": env.str("DB_PASSWORD", ""),
     }
 }
 
 
-REDIS_HOST = env.get("REDIS_HOST", "localhost")
-REDIS_PORT = int(env.get("REDIS_PORT", 6379))
-REDIS_MAIN_DB_NO = int(env.get("REDIS_MAIN_DB_NO", 0))
+REDIS_HOST = env.str("REDIS_HOST", "localhost")
+REDIS_PORT = env.int("REDIS_PORT", 6379)
+REDIS_MAIN_DB_NO = env.int("REDIS_MAIN_DB_NO", 0)
 
 
 # Password validation
