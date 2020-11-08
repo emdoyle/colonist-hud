@@ -76,7 +76,10 @@ class GameEventConsumer(AsyncWebsocketConsumer):
             print(f"This opcode is not catalogued {text_data_json['id']}")
             return
         coros = []
-        for subscriber in chain(self.subscribers[opcode], self.broadcast_subscribers):
+        for subscriber in filter(
+            lambda subscriber: subscriber.should_receive,
+            chain(self.subscribers[opcode], self.broadcast_subscribers),
+        ):
             coros.append(subscriber.receive(text_data_json))
         results = await asyncio.gather(*coros)
         for result in filter(lambda res: res is not None, results):

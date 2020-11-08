@@ -51,12 +51,12 @@ class MessageObserver(BaseMessageObserver):
         pass
 
     async def receive(self, message: Dict) -> Optional[Any]:
+        if not self.should_receive:
+            return
         try:
             opcode = Opcode(int(message.get("id", "-1")))
             data = message.get("data", {})
         except TypeError:
-            return
-        if not self.should_receive:
             return
         result = await getattr(
             self, f"receive_{opcode.name.lower()}", self.receive_default
