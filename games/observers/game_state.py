@@ -19,3 +19,11 @@ class GameStateWriter(MessageObserver):
     async def receive_player_info(self, message: Dict):
         self.game_state.players = deserialize_player_data(message)
         self.game_state.initialized = True
+
+
+class BoardStateWriter(MessageObserver):
+    def __repr__(self):
+        return f"{type(self).__name__}(id={id(self)}, board={self.game_state.board})"
+
+    async def receive_hex_state_change(self, message: Dict):
+        ...
