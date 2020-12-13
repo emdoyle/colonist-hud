@@ -1,6 +1,7 @@
 from ingestion.constants import Opcode
 from .player import *
 from .resources import *
+from .board import *
 
 
 MESSAGE_OPCODE_DESERIALIZERS = {

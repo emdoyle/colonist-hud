@@ -44,9 +44,13 @@ class GameTileEdge:
 class GameTile:
     hex_face: Point2D
     tile_type: int
-    has_robber: bool
+    tile_piece_types: int
     dice_number: int
-    dice_probability: int
+    dice_probability: Optional[int]
+
+    @property
+    def has_robber(self) -> bool:
+        return self.tile_piece_types == 1
 
 
 @dataclass

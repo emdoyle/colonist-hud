@@ -1,4 +1,5 @@
 from games.mapping import deserialize_player_data, Dict
+from games.mapping.board import deserialize_game_board
 from games.observers.base import MessageObserver
 
 
@@ -26,4 +27,4 @@ class BoardStateWriter(MessageObserver):
         return f"{type(self).__name__}(id={id(self)}, board={self.game_state.board})"
 
     async def receive_hex_state_change(self, message: Dict):
-        ...
+        self.game_state.board = deserialize_game_board(message)
